@@ -334,10 +334,10 @@ export type ToolsConfig = {
   byProvider?: Record<string, ToolPolicyConfig>;
   web?: {
     search?: {
-      /** Enable web search tool (default: true when API key is present). */
+      /** Enable web search tool (default: true). */
       enabled?: boolean;
-      /** Search provider ("brave", "perplexity", or "grok"). */
-      provider?: "brave" | "perplexity" | "grok";
+      /** Search provider (default: "searxng"). */
+      provider?: "brave" | "perplexity" | "grok" | "searxng" | "tavily";
       /** Brave Search API key (optional; defaults to BRAVE_API_KEY env var). */
       apiKey?: string;
       /** Default search results count (1-10). */
@@ -363,6 +363,28 @@ export type ToolsConfig = {
         model?: string;
         /** Include inline citations in response text as markdown links (default: false). */
         inlineCitations?: boolean;
+      };
+      /** SearXNG-specific configuration (used when provider="searxng"). */
+      searxng?: {
+        /** Base URL of the SearXNG instance (defaults to SEARXNG_BASE_URL env var or a public instance). */
+        baseUrl?: string;
+        /** Comma-separated list of search engines to use (e.g., "google,duckduckgo,bing"). */
+        engines?: string;
+        /** Search language (e.g., "en", "de", "fr"). */
+        language?: string;
+        /** Safe search level (0 = off, 1 = moderate, 2 = strict). */
+        safeSearch?: number;
+      };
+      /** Tavily-specific configuration (used when provider="tavily"). */
+      tavily?: {
+        /** API key for Tavily (defaults to TAVILY_API_KEY env var). */
+        apiKey?: string;
+        /** Search depth ("basic" or "advanced"). */
+        searchDepth?: "basic" | "advanced";
+        /** Include raw content in results (default: false). */
+        includeRawContent?: boolean;
+        /** Include a generated answer summary (default: true). */
+        includeAnswer?: boolean;
       };
     };
     fetch?: {

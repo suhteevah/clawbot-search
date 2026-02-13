@@ -99,7 +99,8 @@ async function promptWebToolsConfig(
   note(
     [
       "Web search lets your agent look things up online using the `web_search` tool.",
-      "It requires a Brave Search API key (you can store it in the config or set BRAVE_API_KEY in the Gateway environment).",
+      "Choose a provider: SearXNG (free, no API key), Tavily (AI-optimized, free tier),",
+      "Brave, Perplexity, or Grok (all require API keys).",
       "Docs: https://docs.openclaw.ai/tools/web",
     ].join("\n"),
     "Web search",
@@ -107,39 +108,109 @@ async function promptWebToolsConfig(
 
   const enableSearch = guardCancel(
     await confirm({
-      message: "Enable web_search (Brave Search)?",
+      message: "Enable web_search?",
       initialValue: existingSearch?.enabled ?? hasSearchKey,
     }),
     runtime,
   );
 
-  let nextSearch = {
+  let nextSearch: Record<string, unknown> = {
     ...existingSearch,
     enabled: enableSearch,
   };
 
   if (enableSearch) {
-    const keyInput = guardCancel(
-      await text({
-        message: hasSearchKey
-          ? "Brave Search API key (leave blank to keep current or use BRAVE_API_KEY)"
-          : "Brave Search API key (paste it here; leave blank to use BRAVE_API_KEY)",
-        placeholder: hasSearchKey ? "Leave blank to keep current" : "BSA...",
+    const providerChoice = guardCancel(
+      await select({
+        message: "Which search provider?",
+        options: [
+          { value: "searxng", label: "SearXNG (free, no API key needed)" },
+          { value: "tavily", label: "Tavily (AI-optimized, 1k free queries/month)" },
+          { value: "brave", label: "Brave Search (requires API key)" },
+          { value: "perplexity", label: "Perplexity Sonar (requires API key)" },
+          { value: "grok", label: "xAI Grok (requires API key)" },
+        ],
+        initialValue: (existingSearch as Record<string, unknown>)?.provider as string ?? "searxng",
       }),
       runtime,
     );
-    const key = String(keyInput ?? "").trim();
-    if (key) {
-      nextSearch = { ...nextSearch, apiKey: key };
-    } else if (!hasSearchKey) {
-      note(
-        [
-          "No key stored yet, so web_search will stay unavailable.",
-          "Store a key here or set BRAVE_API_KEY in the Gateway environment.",
-          "Docs: https://docs.openclaw.ai/tools/web",
-        ].join("\n"),
-        "Web search",
+
+    nextSearch = { ...nextSearch, provider: providerChoice };
+
+    if (providerChoice === "brave") {
+      const keyInput = guardCancel(
+        await text({
+          message: hasSearchKey
+            ? "Brave Search API key (leave blank to keep current or use BRAVE_API_KEY)"
+            : "Brave Search API key (paste it here; leave blank to use BRAVE_API_KEY)",
+          placeholder: hasSearchKey ? "Leave blank to keep current" : "BSA...",
+        }),
+        runtime,
       );
+      const key = String(keyInput ?? "").trim();
+      if (key) {
+        nextSearch = { ...nextSearch, apiKey: key };
+      } else if (!hasSearchKey) {
+        note(
+          [
+            "No key stored yet, so web_search will stay unavailable.",
+            "Store a key here or set BRAVE_API_KEY in the Gateway environment.",
+            "Docs: https://docs.openclaw.ai/tools/web",
+          ].join("\n"),
+          "Web search",
+        );
+      }
+    } else if (providerChoice === "tavily") {
+      const existingTavilyKey = Boolean((existingSearch as Record<string, unknown>)?.tavily);
+      const keyInput = guardCancel(
+        await text({
+          message: existingTavilyKey
+            ? "Tavily API key (leave blank to keep current or use TAVILY_API_KEY)"
+            : "Tavily API key (get one free at app.tavily.com; leave blank to use TAVILY_API_KEY)",
+          placeholder: existingTavilyKey ? "Leave blank to keep current" : "tvly-...",
+        }),
+        runtime,
+      );
+      const key = String(keyInput ?? "").trim();
+      if (key) {
+        nextSearch = { ...nextSearch, tavily: { ...((existingSearch as Record<string, unknown>)?.tavily as Record<string, unknown> ?? {}), apiKey: key } };
+      }
+    } else if (providerChoice === "searxng") {
+      const keyInput = guardCancel(
+        await text({
+          message: "SearXNG instance URL (leave blank for public instance)",
+          placeholder: "https://search.inetol.net",
+        }),
+        runtime,
+      );
+      const url = String(keyInput ?? "").trim();
+      if (url) {
+        nextSearch = { ...nextSearch, searxng: { ...((existingSearch as Record<string, unknown>)?.searxng as Record<string, unknown> ?? {}), baseUrl: url } };
+      }
+    } else if (providerChoice === "perplexity") {
+      const keyInput = guardCancel(
+        await text({
+          message: "Perplexity/OpenRouter API key (or set PERPLEXITY_API_KEY env var)",
+          placeholder: "pplx-... or sk-or-...",
+        }),
+        runtime,
+      );
+      const key = String(keyInput ?? "").trim();
+      if (key) {
+        nextSearch = { ...nextSearch, perplexity: { ...((existingSearch as Record<string, unknown>)?.perplexity as Record<string, unknown> ?? {}), apiKey: key } };
+      }
+    } else if (providerChoice === "grok") {
+      const keyInput = guardCancel(
+        await text({
+          message: "xAI API key (or set XAI_API_KEY env var)",
+          placeholder: "xai-...",
+        }),
+        runtime,
+      );
+      const key = String(keyInput ?? "").trim();
+      if (key) {
+        nextSearch = { ...nextSearch, grok: { ...((existingSearch as Record<string, unknown>)?.grok as Record<string, unknown> ?? {}), apiKey: key } };
+      }
     }
   }
 

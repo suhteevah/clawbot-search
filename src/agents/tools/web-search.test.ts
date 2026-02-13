@@ -35,6 +35,8 @@ const {
   resolveGrokModel,
   resolveGrokInlineCitations,
   extractGrokContent,
+  resolveSearXNGBaseUrl,
+  resolveTavilyApiKey,
 } = __testing;
 
 describe("web_search perplexity baseUrl defaults", () => {
@@ -222,5 +224,57 @@ describe("web_search grok response parsing", () => {
     const result = extractGrokContent({});
     expect(result.text).toBeUndefined();
     expect(result.annotationCitations).toEqual([]);
+  });
+});
+
+describe("web_search searxng config resolution", () => {
+  it("uses config baseUrl when provided", () => {
+    expect(resolveSearXNGBaseUrl({ baseUrl: "https://my-searxng.example.com" })).toBe(
+      "https://my-searxng.example.com",
+    );
+  });
+
+  it("strips trailing slash from baseUrl", () => {
+    expect(resolveSearXNGBaseUrl({ baseUrl: "https://my-searxng.example.com/" })).toBe(
+      "https://my-searxng.example.com",
+    );
+  });
+
+  it("falls back to SEARXNG_BASE_URL env var", () => {
+    withEnv({ SEARXNG_BASE_URL: "https://env-searxng.example.com" }, () => {
+      expect(resolveSearXNGBaseUrl({})).toBe("https://env-searxng.example.com");
+    });
+  });
+
+  it("defaults to public instance when no config or env", () => {
+    withEnv({ SEARXNG_BASE_URL: undefined }, () => {
+      expect(resolveSearXNGBaseUrl({})).toBe("https://search.inetol.net");
+      expect(resolveSearXNGBaseUrl(undefined)).toBe("https://search.inetol.net");
+    });
+  });
+});
+
+describe("web_search tavily config resolution", () => {
+  it("uses config apiKey when provided", () => {
+    expect(resolveTavilyApiKey({ apiKey: "tvly-test-key" })).toBe("tvly-test-key");
+  });
+
+  it("falls back to TAVILY_API_KEY env var", () => {
+    withEnv({ TAVILY_API_KEY: "tvly-env-key" }, () => {
+      expect(resolveTavilyApiKey({})).toBe("tvly-env-key");
+    });
+  });
+
+  it("returns undefined when no apiKey is available", () => {
+    withEnv({ TAVILY_API_KEY: undefined }, () => {
+      expect(resolveTavilyApiKey({})).toBeUndefined();
+      expect(resolveTavilyApiKey(undefined)).toBeUndefined();
+    });
+  });
+
+  it("prefers config apiKey over env var", () => {
+    withEnv({ TAVILY_API_KEY: "tvly-env-key" }, () => {
+      expect(resolveTavilyApiKey({ apiKey: "tvly-config-key" })).toBe("tvly-config-key");
+    });
   });
 });

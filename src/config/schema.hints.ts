@@ -162,6 +162,14 @@ const FIELD_LABELS: Record<string, string> = {
   "tools.web.search.maxResults": "Web Search Max Results",
   "tools.web.search.timeoutSeconds": "Web Search Timeout (sec)",
   "tools.web.search.cacheTtlMinutes": "Web Search Cache TTL (min)",
+  "tools.web.search.searxng.baseUrl": "SearXNG Base URL",
+  "tools.web.search.searxng.engines": "SearXNG Engines",
+  "tools.web.search.searxng.language": "SearXNG Language",
+  "tools.web.search.searxng.safeSearch": "SearXNG Safe Search",
+  "tools.web.search.tavily.apiKey": "Tavily API Key",
+  "tools.web.search.tavily.searchDepth": "Tavily Search Depth",
+  "tools.web.search.tavily.includeRawContent": "Tavily Include Raw Content",
+  "tools.web.search.tavily.includeAnswer": "Tavily Include Answer",
   "tools.web.fetch.enabled": "Enable Web Fetch Tool",
   "tools.web.fetch.maxChars": "Web Fetch Max Chars",
   "tools.web.fetch.timeoutSeconds": "Web Fetch Timeout (sec)",
@@ -443,8 +451,10 @@ const FIELD_HELP: Record<string, string> = {
   "tools.message.crossContext.marker.suffix":
     'Text suffix for cross-context markers (supports "{channel}").',
   "tools.message.broadcast.enabled": "Enable broadcast action (default: true).",
-  "tools.web.search.enabled": "Enable the web_search tool (requires a provider API key).",
-  "tools.web.search.provider": 'Search provider ("brave" or "perplexity").',
+  "tools.web.search.enabled":
+    "Enable the web_search tool (defaults to SearXNG, free, no API key required).",
+  "tools.web.search.provider":
+    'Search provider (default: "searxng"). Options: "searxng", "tavily", "brave", "perplexity", "grok".',
   "tools.web.search.apiKey": "Brave Search API key (fallback: BRAVE_API_KEY env var).",
   "tools.web.search.maxResults": "Default number of results to return (1-10).",
   "tools.web.search.timeoutSeconds": "Timeout in seconds for web_search requests.",
@@ -455,6 +465,22 @@ const FIELD_HELP: Record<string, string> = {
     "Perplexity base URL override (default: https://openrouter.ai/api/v1 or https://api.perplexity.ai).",
   "tools.web.search.perplexity.model":
     'Perplexity model override (default: "perplexity/sonar-pro").',
+  "tools.web.search.searxng.baseUrl":
+    "SearXNG instance base URL (fallback: SEARXNG_BASE_URL env var, or a public instance).",
+  "tools.web.search.searxng.engines":
+    'Comma-separated engines to query (e.g., "google,duckduckgo,bing").',
+  "tools.web.search.searxng.language":
+    'Search language code (e.g., "en", "de", "fr").',
+  "tools.web.search.searxng.safeSearch":
+    "Safe search level (0 = off, 1 = moderate, 2 = strict).",
+  "tools.web.search.tavily.apiKey":
+    "Tavily API key (fallback: TAVILY_API_KEY env var). Free tier: 1,000 queries/month.",
+  "tools.web.search.tavily.searchDepth":
+    'Search depth ("basic" or "advanced"). Advanced returns more detailed results.',
+  "tools.web.search.tavily.includeRawContent":
+    "Include raw page content in results (default: false).",
+  "tools.web.search.tavily.includeAnswer":
+    "Include an AI-generated answer summary (default: true).",
   "tools.web.fetch.enabled": "Enable the web_fetch tool (lightweight HTTP fetch).",
   "tools.web.fetch.maxChars": "Max characters returned by web_fetch (truncated).",
   "tools.web.fetch.maxCharsCap":
