@@ -1,4 +1,4 @@
-# 🦞 OpenClaw — Personal AI Assistant
+# 🦞 OpenClaw — Free Web Search Fork
 
 <p align="center">
     <picture>
@@ -8,15 +8,88 @@
 </p>
 
 <p align="center">
-  <strong>EXFOLIATE! EXFOLIATE!</strong>
+  <strong>Web search that doesn't cost a dime.</strong>
 </p>
 
 <p align="center">
-  <a href="https://github.com/openclaw/openclaw/actions/workflows/ci.yml?branch=main"><img src="https://img.shields.io/github/actions/workflow/status/openclaw/openclaw/ci.yml?branch=main&style=for-the-badge" alt="CI status"></a>
-  <a href="https://github.com/openclaw/openclaw/releases"><img src="https://img.shields.io/github/v/release/openclaw/openclaw?include_prereleases&style=for-the-badge" alt="GitHub release"></a>
-  <a href="https://discord.gg/clawd"><img src="https://img.shields.io/discord/1456350064065904867?label=Discord&logo=discord&logoColor=white&color=5865F2&style=for-the-badge" alt="Discord"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+  <a href="https://ko-fi.com/Z8Z61UCUI7"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi"></a>
 </p>
+
+<p align="center">
+  <a href="https://github.com/openclaw/openclaw"><img src="https://img.shields.io/badge/upstream-openclaw%2Fopenclaw-blue?style=for-the-badge" alt="Upstream"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="MIT License"></a>
+  <a href="https://discord.gg/clawd"><img src="https://img.shields.io/discord/1456350064065904867?label=Discord&logo=discord&logoColor=white&color=5865F2&style=for-the-badge" alt="Discord"></a>
+</p>
+
+---
+
+## What this fork adds
+
+This fork replaces Brave Search (paid API) as the default `web_search` provider with **free alternatives** that work out of the box:
+
+| Provider | Cost | API Key? | AI-Optimized? |
+|----------|------|----------|---------------|
+| **SearXNG** (default) | Free forever | No | Aggregates Google, DuckDuckGo, Bing |
+| **Tavily** | 1,000 free/month | Yes | Yes - returns answer summaries + ranked results |
+| Brave Search | Paid | Yes | No |
+| Perplexity Sonar | Paid | Yes | Yes |
+| xAI Grok | Paid | Yes | Yes |
+
+**Zero config needed.** Install and go. SearXNG uses public instances by default - no API key, no signup, no credit card.
+
+### Quick start
+
+```yaml
+# Default config - just works, no keys needed
+tools:
+  web:
+    search:
+      enabled: true
+      # provider defaults to "searxng" - free, unlimited, no API key
+```
+
+```yaml
+# Or use Tavily for AI-optimized results (free tier: 1k queries/month)
+tools:
+  web:
+    search:
+      provider: tavily
+      tavily:
+        apiKey: tvly-...  # or set TAVILY_API_KEY env var
+```
+
+### Why?
+
+Brave Search API costs money. Every query costs money. If you're running a personal AI assistant that searches the web constantly, those API calls add up fast. SearXNG is a metasearch engine that aggregates results from Google, DuckDuckGo, Bing, and others - completely free, no rate limits, self-hostable if you want.
+
+---
+
+## Files changed from upstream
+
+```
+src/agents/tools/web-search.ts          - SearXNG + Tavily provider implementations
+src/config/types.tools.ts               - New provider config types
+src/config/zod-schema.agent-runtime.ts  - Validation schemas
+src/commands/configure.wizard.ts        - Wizard now offers provider selection
+src/config/schema.field-metadata.ts     - Field labels
+src/config/schema.hints.ts              - Field descriptions
+skills/web-search/SKILL.md              - New skill documentation
++ tests for all new providers
+```
+
+> Upstream: [openclaw/openclaw](https://github.com/openclaw/openclaw)
+
+---
+
+## Support this work
+
+If this saved you from paying for search API keys, consider buying me a coffee:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Z8Z61UCUI7)
+
+---
+
+# Original OpenClaw README
 
 **OpenClaw** is a _personal AI assistant_ you run on your own devices.
 It answers you on the channels you already use (WhatsApp, Telegram, Slack, Discord, Google Chat, Signal, iMessage, Microsoft Teams, WebChat), plus extension channels like BlueBubbles, Matrix, Zalo, and Zalo Personal. It can speak and listen on macOS/iOS/Android, and can render a live Canvas you control. The Gateway is just the control plane — the product is the assistant.
