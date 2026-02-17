@@ -2,7 +2,7 @@
 name: web-search
 description: Search the web using free and paid providers (SearXNG, Tavily, Brave, Perplexity, Grok).
 homepage: https://docs.openclaw.ai/tools/web
-metadata: { "openclaw": { "emoji": "🔍", "requires": { "bins": ["curl"] } } }
+metadata: { "openclaw": { "emoji": "🔍" } }
 ---
 
 # Web Search
